@@ -10,4 +10,11 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="label_empty_recipes">Whoops, there\'s no recipes available</string>
+    <string name="title_new_recipe">New recipe</string>
+    <string name="label_name_recipe">Recipe name</string>
+    <string name="title_ingredients_full_recipe">Ingredients</string>
+    <string name="title_prepare_mode_full_recipe">Prepare Mode</string>
+    <string name="title_recipes">Recipes</string>
+    <string name="title_recipe_detail">Details</string>
 </resources>
