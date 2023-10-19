@@ -76,7 +76,6 @@ class DetailFragment : Fragment() {
         }
 
         ingredientsAdapter.click = {
-            // @TODO Dialog with edit and delete options
             showEditOrDeleteDialog(
                 "Ingredient",
                 DialogEditItemListFragment.INGREDIENT_DIALOG,
@@ -86,7 +85,6 @@ class DetailFragment : Fragment() {
         }
 
         prepareModesAdapter.click = {
-            // @TODO Dialog with edit and delete options
             showEditOrDeleteDialog(
                 "Prepare Mode",
                 DialogEditItemListFragment.PREPARE_MODE_DIALOG,
