@@ -12,14 +12,43 @@ import com.example.homerecipes.data.repository.RecipeRepositoryImpl
 import com.example.homerecipes.domain.model.RecipeDomain
 import com.example.homerecipes.domain.usecase.GetAllRecipesUseCase
 import com.example.homerecipes.domain.usecase.InsertRecipeUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class RecipeViewModel(
     private val getAllRecipesUseCase: GetAllRecipesUseCase,
     private val insertRecipeUseCase: InsertRecipeUseCase
 ): ViewModel() {
+    private val _state = MutableSharedFlow<RecipeState>()
+    val state: SharedFlow<RecipeState> = _state
+
+    init {
+        getAllRecipes()
+    }
+
+    private fun getAllRecipes() = viewModelScope.launch {
+        getAllRecipesUseCase()
+            .flowOn(Dispatchers.Main)
+            .onStart {
+                _state.emit(RecipeState.Loading)
+            }.catch {
+                _state.emit(RecipeState.Error(it.message.toString()))
+            }.collect { recipes ->
+                if (recipes.isEmpty())
+                    _state.emit(RecipeState.Empty)
+                else
+                    _state.emit(RecipeState.Success(recipes))
+            }
+    }
+
     // This is the implementation of the "state-machine" for the Recipes DB interaction
-    val state: LiveData<RecipeState> = liveData {
+    /*val state: LiveData<RecipeState> = liveData {
         emit(RecipeState.Loading)
 
         val state = try {
@@ -35,7 +64,7 @@ class RecipeViewModel(
         }
 
         emit(state)
-    }
+    }*/
 
     fun insert(name: String) = viewModelScope.launch {
         insertRecipeUseCase(RecipeDomain(name = name))

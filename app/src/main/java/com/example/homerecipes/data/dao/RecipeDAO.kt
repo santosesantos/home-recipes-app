@@ -10,11 +10,12 @@ import com.example.homerecipes.data.entity.FullRecipeEntity
 import com.example.homerecipes.data.entity.IngredientEntity
 import com.example.homerecipes.data.entity.PrepareModeEntity
 import com.example.homerecipes.data.entity.RecipeEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecipeDAO {
     @Query("SELECT * FROM recipe")
-    fun getAll(): List<RecipeEntity>
+    fun getAll(): Flow<List<RecipeEntity>>
 
     @Insert
     fun insert(recipe: RecipeEntity)
@@ -27,7 +28,7 @@ interface RecipeDAO {
 
     @Transaction
     @Query("SELECT * FROM recipe WHERE id = :recipeId")
-    fun getFullRecipe(recipeId: Int): FullRecipeEntity
+    fun getFullRecipe(recipeId: Int): Flow<FullRecipeEntity>
 
     @Update
     fun updateIngredient(ingredient: IngredientEntity)

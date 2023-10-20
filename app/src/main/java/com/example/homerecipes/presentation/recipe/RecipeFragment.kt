@@ -11,6 +11,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.homerecipes.R
 import com.example.homerecipes.databinding.FragmentRecipeBinding
@@ -19,6 +23,9 @@ import com.example.homerecipes.presentation.dialog.DialogEditTextFragment.Compan
 import com.example.homerecipes.presentation.recipe.adapter.RecipeAdapter
 import com.example.homerecipes.presentation.recipe.viewmodel.RecipeState
 import com.example.homerecipes.presentation.recipe.viewmodel.RecipeViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class RecipeFragment : Fragment() {
     private val viewModel: RecipeViewModel by viewModels {
@@ -113,5 +120,13 @@ class RecipeFragment : Fragment() {
             placeholder = getString(R.string.label_name_recipe),
             fragmentManager = parentFragmentManager
         )
+    }
+
+    fun <T> Flow<T>.observe(owner: LifecycleOwner, observe: (T) -> Unit) {
+        owner.lifecycleScope.launch {
+            owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                this@observe.collect(observe)
+            }
+        }
     }
 }

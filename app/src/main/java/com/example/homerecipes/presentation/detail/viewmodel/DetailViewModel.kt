@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.homerecipes.data.db
 import com.example.homerecipes.data.repository.RecipeRepositoryImpl
+import com.example.homerecipes.domain.model.FullRecipeDomain
 import com.example.homerecipes.domain.model.IngredientDomain
 import com.example.homerecipes.domain.model.PrepareModeDomain
 import com.example.homerecipes.domain.usecase.DeleteIngredientUseCase
@@ -18,7 +19,14 @@ import com.example.homerecipes.domain.usecase.InsertIngredientUseCase
 import com.example.homerecipes.domain.usecase.InsertPrepareModeUseCase
 import com.example.homerecipes.domain.usecase.UpdateIngredientUseCase
 import com.example.homerecipes.domain.usecase.UpdatePrepareModeUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DetailViewModel(
     private val idRecipe: Int,
@@ -30,7 +38,26 @@ class DetailViewModel(
     private val deleteIngredientUseCase: DeleteIngredientUseCase,
     private val deletePrepareModeUseCase: DeletePrepareModeUseCase
 ): ViewModel() {
-    val state: LiveData<DetailState> = liveData {
+    private val _state = MutableSharedFlow<DetailState>()
+    val state :SharedFlow<DetailState> = _state
+
+    init {
+        getFullRecipe()
+    }
+
+    private fun getFullRecipe() = viewModelScope.launch {
+        getFullRecipeUseCase(idRecipe)
+            .flowOn(Dispatchers.Main)
+            .onStart {
+                _state.emit(DetailState.Loading)
+            }.catch {
+                _state.emit(DetailState.Error(it.message.toString()))
+            }.collect { fullRecipe ->
+                _state.emit(DetailState.Success(fullRecipe))
+            }
+    }
+
+    /*val state: LiveData<DetailState> = liveData {
         emit(DetailState.Loading)
 
         val state = try {
@@ -42,7 +69,7 @@ class DetailViewModel(
         }
 
         emit(state)
-    }
+    }*/
 
     fun insertIngredient(idRecipe: Int, ingredientName: String) = viewModelScope.launch {
         insertIngredientUseCase(IngredientDomain(idRecipe = idRecipe, name = ingredientName))

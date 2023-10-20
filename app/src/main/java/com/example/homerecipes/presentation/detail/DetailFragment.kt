@@ -10,6 +10,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.example.homerecipes.databinding.FragmentDetailBinding
 import com.example.homerecipes.presentation.detail.adapter.ItemListAdapter
@@ -21,6 +25,8 @@ import com.example.homerecipes.presentation.dialog.DialogEditTextFragment
 import com.example.homerecipes.presentation.dialog.DialogEditTextFragment.Companion.FRAGMENT_RESULT
 import com.example.homerecipes.presentation.mapper.toModelIngredient
 import com.example.homerecipes.presentation.mapper.toModelPrepareMode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class DetailFragment : Fragment() {
     private val args: DetailFragmentArgs by navArgs()
@@ -173,5 +179,13 @@ class DetailFragment : Fragment() {
             itemId = itemId,
             itemName = itemName
         )
+    }
+
+    fun <T> Flow<T>.observe(owner: LifecycleOwner, observe: (T) -> Unit) {
+        owner.lifecycleScope.launch {
+            owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                this@observe.collect(observe)
+            }
+        }
     }
 }
