@@ -13,7 +13,7 @@ import com.example.homerecipes.data.entity.RecipeEntity
         IngredientEntity::class,
         PrepareModeEntity::class
     ],
-    version = 1
+    version = 2
 )
 abstract class AppDatabase: RoomDatabase() {
     abstract fun recipeDAO(): RecipeDAO

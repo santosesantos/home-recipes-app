@@ -67,7 +67,7 @@ class RecipeViewModel(
     }*/
 
     fun insert(name: String) = viewModelScope.launch {
-        insertRecipeUseCase(RecipeDomain(name = name))
+        insertRecipeUseCase(RecipeDomain(name = name, prepareTime = "42 min"))
     }
 
     class Factory: ViewModelProvider.Factory {
